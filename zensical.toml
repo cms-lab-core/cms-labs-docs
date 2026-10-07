@@ -11,15 +11,16 @@ docs_dir = "docs"
 site_dir = "site"
 nav = [
   { "Главная" = "index.md" },
-  { "Установка" = [
-    { "Выбор варианта" = "installation/index.md" },
-    { "Разработка" = [
-      { "Обзор" = "installation/development/index.md" },
-      { "Docker Compose" = "installation/development/docker-compose.md" },
-      { "Локальный Kubernetes (kind)" = "installation/development/kind.md" },
-    ] },
-    { "Виртуальная машина (cloud-init)" = "installation/virtual-machine.md" },
-    { "Kubernetes-кластер" = "installation/kubernetes.md" },
+  { "Использование" = [
+    { "Выбор варианта" = "usage/index.md" },
+    { "GitHub Codespaces" = "usage/codespaces.md" },
+    { "Локальный kind" = "usage/kind.md" },
+    { "Kubernetes-кластер" = "usage/kubernetes.md" },
+  ] },
+  { "Для разработчика" = [
+    { "Выбор контура" = "development/index.md" },
+    { "Полный стенд в kind" = "development/kind.md" },
+    { "Разработка cms-labs-api" = "development/api.md" },
   ] },
   { "Лабораторные работы" = [
     { "Каталог" = "labs/index.md" },
