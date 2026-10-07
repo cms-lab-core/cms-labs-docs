@@ -1,4 +1,4 @@
-FROM docker.io/library/python:3.14.2-slim AS build
+FROM docker.io/library/python:3.14.7-slim AS build
 
 ARG ZENSICAL_VERSION=0.0.67
 WORKDIR /src
