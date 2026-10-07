@@ -1,0 +1,75 @@
+[project]
+site_name = "CMS Labs"
+site_url = "https://cms-lab-core.github.io/cms-labs-docs/"
+site_description = "Документация платформы интерактивных сетевых лабораторных работ CMS Labs"
+site_author = "CMS Labs contributors"
+copyright = "&copy; 2026 CMS Labs contributors"
+repo_url = "https://github.com/cms-lab-core/cms-labs-docs"
+repo_name = "cms-lab-core/cms-labs-docs"
+edit_uri = "edit/main/docs/"
+docs_dir = "docs"
+site_dir = "site"
+nav = [
+  { "Главная" = "index.md" },
+  { "Установка" = [
+    { "Выбор варианта" = "installation/index.md" },
+    { "Разработка" = [
+      { "Обзор" = "installation/development/index.md" },
+      { "Docker Compose" = "installation/development/docker-compose.md" },
+      { "Локальный Kubernetes (kind)" = "installation/development/kind.md" },
+    ] },
+    { "Виртуальная машина (cloud-init)" = "installation/virtual-machine.md" },
+    { "Kubernetes-кластер" = "installation/kubernetes.md" },
+  ] },
+  { "Лабораторные работы" = [
+    { "Каталог" = "labs/index.md" },
+    { "Компьютерные сети" = [
+      { "О курсе" = "labs/computer-networks/index.md" },
+      { "Лабораторная работа № 1" = "labs/computer-networks/lab-001.md" },
+    ] },
+  ] },
+  { "Техническая документация" = [
+    { "Обзор архитектуры" = "technical/architecture.md" },
+    { "Компоненты" = "technical/components.md" },
+    { "Контракт лабораторной" = "technical/lab-contract.md" },
+    { "Жизненный цикл сессии" = "technical/session-lifecycle.md" },
+    { "Аутентификация и доступ" = "technical/authentication.md" },
+    { "Эксплуатация" = "technical/operations.md" },
+    { "Диагностика" = "technical/troubleshooting.md" },
+  ] },
+  { "Участие в проекте" = "contributing.md" },
+  { "Глоссарий" = "glossary.md" },
+]
+
+[project.theme]
+language = "ru"
+features = [
+  "content.action.edit",
+  "content.action.view",
+  "navigation.instant",
+  "navigation.instant.progress",
+  "navigation.path",
+  "navigation.sections",
+  "navigation.tabs",
+  "navigation.tabs.sticky",
+  "navigation.top",
+  "search.highlight",
+  "search.suggest",
+]
+
+[project.theme.icon]
+repo = "fontawesome/brands/github"
+
+[[project.theme.palette]]
+scheme = "default"
+primary = "teal"
+accent = "green"
+toggle.icon = "lucide/sun"
+toggle.name = "Переключить на тёмную тему"
+
+[[project.theme.palette]]
+scheme = "slate"
+primary = "teal"
+accent = "green"
+toggle.icon = "lucide/moon"
+toggle.name = "Переключить на светлую тему"

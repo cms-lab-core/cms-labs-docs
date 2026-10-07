@@ -1,0 +1,7 @@
+.git
+.github
+.venv
+.cache
+site
+.DS_Store
+README.md
