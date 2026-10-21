@@ -10,7 +10,7 @@ COPY docs ./docs
 
 RUN zensical build --clean --strict
 
-FROM docker.io/library/nginx:1.31.6-alpine3.24
+FROM docker.io/library/nginx:1.31.7-alpine3.24
 
 RUN apk upgrade --no-cache \
     && rm -f /etc/nginx/conf.d/default.conf
