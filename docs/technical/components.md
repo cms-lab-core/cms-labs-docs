@@ -15,8 +15,20 @@
 
 Clabgate не должен содержать реализацию терминала или анализатора трафика. Он проверяет право доступа, связывает запрос с попыткой и маршрутизирует его к сервису, развёрнутому контрактом лаборатории.
 
-> **Нужна иллюстрация:** таблица взаимодействий компонентов с направлениями HTTP, WebSocket, Kubernetes API и LTI.
+## Обмен данными
 
-## Репозитории
+| Кто обращается | Куда | Протокол и назначение |
+| --- | --- | --- |
+| Браузер | Frontend | HTTPS для UI и API, WebSocket для интерактивных workspace-сервисов. |
+| Frontend | Backend и Clabgate | HTTP внутри кластера. Nginx сохраняет общий origin для браузера. |
+| Clabgate | Kubernetes API | Создание namespace, ресурсов попытки и checker Job. |
+| Clabgate | Git | Чтение шаблонов и определение ревизии задания. |
+| Terminal и capture | Сетевые узлы | Kubernetes API и средства захвата платформы. |
+| Moodle | CMS backend | Вход и запуск элемента курса по LTI. |
+| CMS backend | Moodle | Отправка оценки через Assignment and Grade Services. |
 
-Актуальный перечень репозиториев и владельцев компонентов необходимо автоматически формировать из организации `cms-lab-core` либо поддерживать здесь после стабилизации структуры проекта.
+## Исходники
+
+- [CMS backend, frontend и Clabgate](https://github.com/cms-lab-core/cms-labs-api)
+- [JupyterLab](https://github.com/cms-lab-core/cms-labs-jupyter) · [Терминалы](https://github.com/cms-lab-core/cms-labs-terminal) · [Capture](https://github.com/cms-lab-core/cms-labs-capture)
+- [Checker](https://github.com/cms-lab-core/cms-labs-checker) · [Clabernetes](https://github.com/srl-labs/clabernetes)

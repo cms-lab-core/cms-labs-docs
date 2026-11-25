@@ -13,6 +13,7 @@ nav = [
   { "Главная" = "index.md" },
   { "Использование" = [
     { "Выбор варианта" = "usage/index.md" },
+    { "Пройти лабораторную" = "usage/student.md" },
     { "GitHub Codespaces" = "usage/codespaces.md" },
     { "Локальный kind" = "usage/kind.md" },
     { "Kubernetes-кластер" = "usage/kubernetes.md" },
@@ -24,10 +25,20 @@ nav = [
   ] },
   { "Лабораторные работы" = [
     { "Каталог" = "labs/index.md" },
+    { "Подключить свою работу" = "labs/authoring.md" },
     { "Компьютерные сети" = [
       { "О курсе" = "labs/computer-networks/index.md" },
-      { "Лабораторная работа № 1" = "labs/computer-networks/lab-001.md" },
+      { "Lab 1.0 УрФУ" = "labs/computer-networks/lab-001.md" },
     ] },
+  ] },
+  { "Администрирование" = [
+    { "Обзор панели" = "admin/index.md" },
+    { "Пользователи, роли и профиль" = "admin/access.md" },
+    { "Серверы" = "admin/servers.md" },
+    { "Маршруты LTI" = "admin/routes.md" },
+    { "Идентификации и Moodle" = "admin/integrations.md" },
+    { "Попытки LTI и оценки" = "admin/attempts.md" },
+    { "Карта и сервисы" = "admin/services.md" },
   ] },
   { "Техническая документация" = [
     { "Обзор архитектуры" = "technical/architecture.md" },
@@ -40,6 +51,12 @@ nav = [
   ] },
   { "Участие в проекте" = "contributing.md" },
   { "Глоссарий" = "glossary.md" },
+]
+
+[project.markdown_extensions]
+pymdownx.details = {}
+pymdownx.superfences.custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
 ]
 
 [project.theme]

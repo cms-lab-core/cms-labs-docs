@@ -1,44 +1,59 @@
 # Разработка cms-labs-api из исходников
 
-Монорепозиторий [`cms-labs-api`](https://github.com/cms-lab-core/cms-labs-api) содержит backend, frontend, Clabgate и локальную Kubernetes-интеграцию. Его README и [`k8s/local-kind/README.md`](https://github.com/cms-lab-core/cms-labs-api/blob/main/k8s/local-kind/README.md) являются источником истины для команд запуска.
+Монорепозиторий содержит backend, Clabgate, frontend и конфигурацию dev-gateway. Используйте Go **1.24.4**, Node.js **22**, Yarn **1.22.22**, Docker с Compose, kubectl, kind и Helm. Понадобится `sql-migrate` для миграций.
 
-## Подготовка полного dev-контура
+## Подготовить окружение
 
 ```bash
-git clone https://github.com/cms-lab-core/cms-labs-api.git
+git clone --branch v1.20.5 https://github.com/cms-lab-core/cms-labs-api.git
 cd cms-labs-api
+
+go install github.com/rubenv/sql-migrate/...@v1.8.1
+export PATH="$(go env GOPATH)/bin:$PATH"
+
+corepack enable
+corepack prepare yarn@1.22.22 --activate
+yarn --cwd nextui-dashboard install --frozen-lockfile
+
+test -e backend/.env || cp backend/.env.test backend/.env
+test -e clabgate/.env || cp clabgate/.env.test clabgate/.env
+
 make dev-up
 ```
 
-`make dev-up` запускает зависимости, создаёт или переиспользует kind, устанавливает Clabernetes и workspace-контроллеры и подготавливает единый development gateway.
+`make dev-up` запускает MySQL и Vault в Compose, создаёт локальный кластер `cms-labs-local` и записывает отдельный kubeconfig `.local/kubeconfig`. Файлы `.env.test` содержат настройки изолированной тестовой среды. Адрес БД для запуска Go-процессов с хоста задайте через `DB_HOST=127.0.0.1`, потому что тестовый hostname по умолчанию доступен внутри контейнерной сети.
 
-## Процессы из исходников
+## Запустить процессы
 
-Запустите в отдельных терминалах:
+Запустите команды из корня репозитория в отдельных терминалах. В терминале backend убедитесь, что `sql-migrate` доступен в `PATH`.
 
 ```bash
-make dev-backend
-make dev-seed
-make dev-clabgate
+DB_HOST=127.0.0.1 LAB_CATALOG_ENABLED=true make dev-backend
+```
+
+```bash
+DB_HOST=127.0.0.1 LAB_CATALOG_ENABLED=true make dev-seed
+```
+
+```bash
+KUBECONFIG="$PWD/.local/kubeconfig" make dev-clabgate
+```
+
+```bash
 make dev-front
 ```
 
-Открывайте приложение через `http://127.0.0.1:18080`, а не напрямую через Vite: gateway сохраняет единый origin для API, cookies, iframe и WebSocket workspace-сервисов.
+`dev-seed` заполняет тестовую базу и завершается. Можно передать файл каталога через `make dev-seed DEMO_CATALOG="$PWD/k8s/local-kind/labs.example.json"`.
 
-## Проверки
+Откройте `http://127.0.0.1:18080/`. Development gateway объединяет API backend на `5000`, Clabgate на `5001`, Vite на `5183` и workspace в одном origin. Если nginx-шаблон менялся, повторите `make dev-cluster-up`.
 
-```bash
-make test
-make pre_commit
-make security
-```
-
-Перед использованием команд сверяйтесь с документацией текущей ветки `cms-labs-api`: состав целей Makefile может изменяться вместе с архитектурой.
-
-## Остановка
+## Проверить и остановить
 
 ```bash
-make dev-down
+kubectl --kubeconfig .local/kubeconfig --context kind-cms-labs-local get pods -A
+yarn --cwd nextui-dashboard lint
+yarn --cwd nextui-dashboard types
+yarn --cwd nextui-dashboard build
 ```
 
-> **Нужна иллюстрация:** четыре терминала с backend, seed, Clabgate и frontend, рядом браузер на development gateway и pod лаборатории в kind.
+Инструкция по запуску CI и тестов из исходников находится в [k8s/local-kind/README.md](https://github.com/cms-lab-core/cms-labs-api/blob/v1.20.5/k8s/local-kind/README.md). Остановите процессы Go и Vite в их терминалах, затем выполните `make dev-down`, чтобы удалить локальное окружение. Сохраните нужные данные стенда заранее.

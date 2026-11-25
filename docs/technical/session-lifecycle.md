@@ -2,19 +2,14 @@
 
 ## Состояния
 
-```text
-created → provisioning → active → terminating → terminated
-                         └──────→ failed
-```
+| В CMS | Что происходит со стендом K8S |
+| --- | --- |
+| `pending` | Попытка ждёт назначения или ресурсов. Clabgate создаёт namespace, проверяет манифесты и наблюдает состояние JupyterLab и топологии. |
+| `active` | Сервер подтвердил рабочий стенд. Clabgate показывает фазу `ready`, когда готовы топология и рабочая область. |
+| `terminating` | Запрошена остановка. Clabgate удаляет ресурсы попытки. |
+| `completed` | Сервер подтвердил завершение. Результат, сохранённый в CMS, остаётся в карточке. |
 
-- `created` — попытка записана в CMS;
-- `provisioning` — Clabgate создаёт namespace и применяет лабораторию;
-- `active` — topology и обязательные workspace-сервисы готовы;
-- `terminating` — новые подключения запрещены, ресурсы завершаются;
-- `terminated` — ресурсы удалены, результаты сохранены;
-- `failed` — запуск или эксплуатация завершились ошибкой.
-
-Сессия становится активной только после подтверждения готовности Clabgate, а не сразу после создания Kubernetes-объектов.
+В состоянии запуска Clabgate может сообщить `provisioning`, `degraded` или `failed`. Для диагностики используйте события namespace, статус топологии и лог соответствующего pod.
 
 ## Завершение
 
@@ -25,4 +20,26 @@ created → provisioning → active → terminating → terminated
 - скачать необходимые PCAP и другие артефакты;
 - убедиться, что автоматические проверки завершены.
 
-> **Нужна иллюстрация:** sequence diagram запуска и завершения с CMS, Clabgate, Kubernetes, checker и browser.
+## Запуск, проверка и завершение
+
+```mermaid
+sequenceDiagram
+    participant Browser as Браузер
+    participant CMS
+    participant Gate as Clabgate
+    participant K8s as Kubernetes
+    participant Checker
+    Browser->>CMS: Запустить попытку
+    CMS->>Gate: Запросить запуск стенда
+    Gate->>K8s: Создать ресурсы попытки
+    K8s-->>Gate: Сообщить о готовности ресурсов
+    Gate-->>CMS: Стенд готов
+    CMS-->>Browser: Показать доступ к стенду
+    Browser->>Gate: Открыть сервис проверки
+    Gate->>Checker: Передать запрос
+    Checker-->>Browser: Вернуть результаты через workspace
+    Browser->>CMS: Завершить попытку
+    CMS->>Gate: Запросить завершение стенда
+    Gate->>K8s: Удалить ресурсы попытки
+    Gate-->>CMS: Подтвердить завершение
+```

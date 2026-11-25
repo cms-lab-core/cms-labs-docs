@@ -1,27 +1,41 @@
 # Полный стенд разработчика в kind
 
-Этот контур устанавливает все опубликованные шаблоны и сервисы так же, как их использует пример лабораторной. Он подходит для изменения контракта задания, Helm values, checker, terminal, capture и проверки совместимости релизов.
+Поднимите [локальный demo-kind](../usage/kind.md) и запустите попытку через каталог. Сценарий подходит для проверки манифестов, образов и совместимости контроллеров с рабочей топологией.
 
-## Запуск
+## Проверить релизы и контейнеры
 
 ```bash
-git clone https://github.com/cms-lab-core/cms-labs-simple-task.git
-cd cms-labs-simple-task
-./scripts/demo up
+helm --kube-context kind-cms-labs-demo list -A
+kubectl --context kind-cms-labs-demo get topology -A
+kubectl --context kind-cms-labs-demo -n cms-labs-system get deployments,pods
 ```
 
-## Рабочий цикл
+[Вывод Helm и kubectl из локального demo-kind](../assets/screenshots/kind-helm.jpg)
 
-1. Измените задание, notebook, topology или values.
-2. Соберите локальный образ изменяемого компонента.
-3. Загрузите образ в kind или задайте его в values.
-4. Обновите Helm release.
-5. Выполните smoke/E2E и проверьте UI, JupyterLab, terminal и checker.
+## Проверить локальный образ
 
-Точные команды загрузки локальных образов и переопределения каждого чарта должны быть добавлены рядом с соответствующим компонентом.
+Пример обновляет **frontend** только в локальном кластере. Подставьте каталог исходников `nextui-dashboard`, если находитесь в другом репозитории.
 
-## Когда этот вариант не подходит
+```bash
+yarn --cwd nextui-dashboard install --frozen-lockfile
+yarn --cwd nextui-dashboard build
+docker build -t cms-labs/frontend:dev ./nextui-dashboard
+kind load docker-image cms-labs/frontend:dev --name cms-labs-demo
 
-Если требуется пошаговая отладка Go backend, Clabgate или Vite frontend, используйте [контур `cms-labs-api` из исходников](api.md).
+kubectl --context kind-cms-labs-demo -n cms-labs-system patch deployment frontend \
+  --type=strategic \
+  -p '{"spec":{"template":{"spec":{"containers":[{"name":"frontend","image":"cms-labs/frontend:dev","imagePullPolicy":"IfNotPresent"}]}}}}'
+kubectl --context kind-cms-labs-demo -n cms-labs-system rollout status deployment/frontend
+```
 
-> **Нужна иллюстрация:** список установленных Helm releases и соответствующих pod в локальном kind.
+`IfNotPresent` позволяет использовать загруженный образ внутри kind. Чтобы вернуться к опубликованной версии, повторите `./scripts/demo up` в репозитории примера. Для итераций с другим тегом обновляйте тег в загрузке и в deployment.
+
+## Переопределить чарт
+
+Команда `demo up` принимает `CMS_LABS_API_CHART`, `CMS_LABS_TERMINAL_CHART` и `CMS_LABS_CAPTURE_CHART`. Для OCI-чарта версию задаёт соответствующая переменная с суффиксом `_VERSION`. Значением переменной чарта может быть путь к локальному чарту.
+
+```bash
+CMS_LABS_TERMINAL_CHART=../cms-labs-terminal/charts/cms-labs-terminal ./scripts/demo up
+```
+
+После изменения откройте стенд, проверьте создание новой попытки, интерактивный терминал и отчёт checker. Для нескольких сервисов меняйте по одному компоненту и записывайте версию, которой воспроизвели проблему.
